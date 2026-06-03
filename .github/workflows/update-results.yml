@@ -1,0 +1,43 @@
+name: Atualizar resultados da Copa 2026
+
+# Busca resultados encerrados e regenera data/results.js.
+# Cron a cada 15 min (horário UTC). Também pode ser disparado manualmente.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# evita execuções sobrepostas
+concurrency:
+  group: update-results
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Buscar resultados (sem API key)
+        run: node scripts/fetch-results.mjs
+
+      - name: Commitar se houve mudança
+        run: |
+          if [ -n "$(git status --porcelain data/results.js)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add data/results.js
+            git commit -m "chore: atualizar resultados da Copa 2026 [skip ci]"
+            git push
+          else
+            echo "Sem mudanças nos resultados."
+          fi

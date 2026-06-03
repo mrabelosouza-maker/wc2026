@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copa do Mundo 2026 — Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="ball">⚽</span>
+      <div>
+        <h1>Copa do Mundo FIFA 2026</h1>
+        <p class="sub">EUA · Canadá · México &nbsp;·&nbsp; 11/jun – 19/jul</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="calendario" role="tab">📅 Calendário</button>
+      <button class="tab" data-tab="previsoes" role="tab">📊 Previsões</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ABA 1: CALENDÁRIO -->
+    <section id="tab-calendario" class="tabpanel active">
+      <div class="legend">
+        <span class="chip brasil-chip">🇧🇷 Jogos do Brasil em destaque</span>
+        <span class="chip">Fase de grupos: 72 jogos · 12 grupos</span>
+      </div>
+
+      <h2 class="section-title">Fase de Grupos</h2>
+      <div id="grupos-grid" class="grupos-grid"></div>
+
+      <h2 class="section-title">Calendário de Jogos (Grupos)</h2>
+      <div id="calendario-lista" class="calendario-lista"></div>
+
+      <h2 class="section-title">Mata-mata</h2>
+      <p class="hint">Os confrontos são exibidos por posição ("Vencedor do Grupo X" vs "2º do Grupo Y")
+        e preenchidos automaticamente conforme os grupos terminam.</p>
+      <div id="bracket" class="bracket"></div>
+    </section>
+
+    <!-- ABA 2: PREVISÕES -->
+    <section id="tab-previsoes" class="tabpanel">
+      <div class="legend">
+        <span class="chip">Modelo: Elo → Poisson + Dixon-Coles</span>
+        <span class="chip">Simulação: Monte Carlo (<span id="mc-n">—</span> torneios)</span>
+        <button id="rerun-sim" class="btn-sim">🎲 Recalcular simulação</button>
+      </div>
+
+      <h2 class="section-title">Probabilidades do Torneio (Monte Carlo)</h2>
+      <p class="hint">Chance de cada seleção avançar de fase e ser campeã, dado o Elo atual
+        e os resultados já encerrados.</p>
+      <div id="mc-tabela" class="mc-tabela"></div>
+
+      <h2 class="section-title">Previsão por Jogo</h2>
+      <p class="hint">Probabilidade de vitória / empate / derrota e placar mais provável.
+        Após o jogo, mostra o resultado real e se o modelo acertou o 1X2.</p>
+      <div id="previsoes-lista" class="previsoes-lista"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span id="status-update">Carregando…</span>
+    <span class="disclaimer">⚠️ Dados de grupos/calendário vêm de pesquisa e devem ser
+      reconferidos na fonte oficial da FIFA. Previsões são estimativas estatísticas.</span>
+  </footer>
+
+  <!-- Dados (variáveis globais — funcionam via file://) -->
+  <script src="js/data/teams.js"></script>
+  <script src="js/data/groups.js"></script>
+  <script src="js/data/fixtures.js"></script>
+  <script src="js/data/bracket.js"></script>
+  <script src="data/results.js"></script>
+
+  <!-- Motor + lógica -->
+  <script src="js/model.js"></script>
+  <script src="js/standings.js"></script>
+  <script src="js/simulate.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

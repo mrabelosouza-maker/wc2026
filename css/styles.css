@@ -1,0 +1,176 @@
+/* ===== Copa 2026 Dashboard — tema CLARO / clean ===== */
+:root {
+  --bg: #f5f7fb;
+  --bg2: #eef1f7;
+  --card: #ffffff;
+  --card2: #f8fafc;
+  --line: #e4e8f0;
+  --line2: #eef1f6;
+  --txt: #1d2436;
+  --muted: #6b7488;
+  --accent: #0a8f6a;     /* verde */
+  --accent-soft: #e6f6f0;
+  --accent2: #b8791a;    /* âmbar p/ títulos/realces */
+  --brasil: #ffce00;
+  --brasil-green: #009c3b;
+  --brasil-bg: #fff9e0;
+  --win: #16a34a;
+  --draw: #cbd2de;
+  --loss: #e0533d;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(20,30,60,.05), 0 6px 18px rgba(20,30,60,.06);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Topbar / tabs ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 26px;
+  background: rgba(255,255,255,.85); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand .ball { font-size: 32px; }
+.brand h1 { font-size: 20px; margin: 0; letter-spacing: .2px; color: #111827; }
+.brand .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+.tabs { display: flex; gap: 8px; }
+.tab {
+  background: var(--card); color: var(--txt); border: 1px solid var(--line);
+  padding: 9px 18px; border-radius: 999px; cursor: pointer; font-size: 14px;
+  transition: .15s; box-shadow: var(--shadow);
+}
+.tab:hover { border-color: var(--accent); color: var(--accent); }
+.tab.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+
+main { padding: 26px; max-width: 1180px; margin: 0 auto; }
+.tabpanel { display: none; animation: fade .2s ease; }
+.tabpanel.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1; transform:none;} }
+
+.section-title {
+  font-size: 16px; margin: 30px 0 14px; padding-bottom: 8px; font-weight: 700;
+  border-bottom: 2px solid var(--accent-soft); color: #111827;
+}
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 16px; line-height: 1.5; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+.chip {
+  background: var(--card); border: 1px solid var(--line); color: var(--muted);
+  padding: 6px 13px; border-radius: 999px; font-size: 12.5px; box-shadow: var(--shadow);
+}
+.brasil-chip { color: #5b4500; background: var(--brasil-bg); border-color: #f4dd8a; font-weight: 600; }
+.btn-sim {
+  background: var(--accent); color: #fff; border: 1px solid var(--accent);
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; font-size: 12.5px; font-weight: 600;
+}
+.btn-sim:hover { filter: brightness(1.05); }
+
+/* ===== Grupos ===== */
+.grupos-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+}
+.grupo-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.grupo-card h3 { margin: 0 0 10px; font-size: 14px; color: var(--accent); font-weight: 700; }
+.grupo-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.grupo-table th { text-align: right; color: var(--muted); font-weight: 500; padding: 2px 4px; }
+.grupo-table td { padding: 5px 4px; border-top: 1px solid var(--line2); }
+.grupo-table td.team-name { text-align: left; }
+.grupo-table .pos { color: var(--muted); width: 18px; }
+.grupo-table tr.q1 td.pos { color: var(--win); font-weight: 700; }
+.grupo-table tr.q2 td.pos { color: var(--accent); font-weight: 700; }
+.grupo-table tr.q3 td.pos { color: var(--accent2); }
+.flag { margin-right: 6px; }
+.row-brasil { background: var(--brasil-bg); }
+.row-brasil td.team-name { color: var(--brasil-green); font-weight: 700; }
+
+/* ===== Calendário lista ===== */
+.calendario-lista { display: flex; flex-direction: column; gap: 10px; }
+.dia-bloco { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+.dia-head { padding: 9px 16px; background: var(--card2); font-size: 13px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--line); }
+.jogo {
+  display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center;
+  gap: 10px; padding: 10px 16px; border-top: 1px solid var(--line2); font-size: 14px;
+}
+.jogo:first-of-type { border-top: none; }
+.jogo .home { text-align: right; }
+.jogo .away { text-align: left; }
+.jogo .placar { font-weight: 700; color: var(--accent); min-width: 46px; text-align: center; }
+.jogo .meta { color: var(--muted); font-size: 11.5px; text-align: right; }
+.jogo.is-brasil { background: linear-gradient(90deg, rgba(0,156,59,.07), rgba(255,206,0,.12)); }
+.jogo.is-brasil .home, .jogo.is-brasil .away { font-weight: 700; }
+.badge-grupo { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 1px 5px; margin-left: 6px; background: var(--card2); }
+
+/* ===== Bracket ===== */
+.bracket { display: flex; gap: 18px; overflow-x: auto; padding-bottom: 12px; }
+.bracket-col { min-width: 215px; }
+.bracket-col h4 { margin: 0 0 4px; font-size: 13px; color: #111827; font-weight: 700; }
+.bracket-col .datas { color: var(--muted); font-size: 11px; margin-bottom: 10px; }
+.bracket-match {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 11px; margin-bottom: 9px; font-size: 13px; box-shadow: var(--shadow);
+}
+.bracket-side { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+.bracket-side.winner { color: var(--win); font-weight: 700; }
+.bracket-side.placeholder { color: var(--muted); font-style: italic; }
+.bracket-side.brasil { color: var(--brasil-green); font-weight: 700; }
+.bracket-match .mid { border-top: 1px dashed var(--line); margin: 3px 0; }
+
+/* ===== Previsões por jogo ===== */
+.previsoes-lista { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.prev-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+.prev-card.is-brasil { border-color: var(--brasil); box-shadow: 0 0 0 2px rgba(255,206,0,.30), var(--shadow); }
+.prev-head { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.prev-head .data { font-size: 11.5px; }
+.prev-teams { display: flex; justify-content: space-between; font-weight: 700; margin-bottom: 9px; font-size: 14px; }
+.prob-bar { display: flex; height: 24px; border-radius: 7px; overflow: hidden; border: 1px solid var(--line); font-size: 11px; }
+.prob-bar > div { display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.prob-bar .pw { background: var(--win); color: #fff; }
+.prob-bar .pd { background: var(--draw); color: #3b4252; }
+.prob-bar .pl { background: var(--loss); color: #fff; }
+.prob-legend { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 6px; }
+.prev-placar { margin-top: 9px; font-size: 13px; }
+.prev-placar b { color: var(--accent2); }
+.prev-real { margin-top: 8px; font-size: 12.5px; padding-top: 8px; border-top: 1px solid var(--line2); }
+.acerto { color: var(--win); font-weight: 700; } .erro { color: var(--loss); font-weight: 700; }
+
+/* ===== Monte Carlo tabela ===== */
+.mc-tabela { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line); }
+table.mc { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); }
+table.mc th, table.mc td { padding: 9px 12px; text-align: right; border-bottom: 1px solid var(--line2); }
+table.mc th { color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--card2); }
+table.mc td.tname { text-align: left; }
+table.mc tr:hover td { background: var(--bg2); }
+table.mc tr.brasil td { background: var(--brasil-bg); }
+table.mc tr.brasil:hover td { background: #fff3c4; }
+table.mc tr.brasil td.tname { color: var(--brasil-green); font-weight: 700; }
+.barcell { position: relative; }
+.barcell .barfill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(10,143,106,.16); }
+.barcell span { position: relative; font-weight: 600; }
+
+/* ===== Footer ===== */
+.footer {
+  margin: 28px 26px; padding: 16px 20px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between;
+  color: var(--muted); font-size: 12px;
+}
+.disclaimer { max-width: 640px; line-height: 1.5; }
+
+::-webkit-scrollbar { height: 10px; width: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d3d9e4; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #c1c9d8; }
