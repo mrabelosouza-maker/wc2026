@@ -15,6 +15,8 @@
   const DIXON_COLES_RHO = -0.05;
   const MAX_GOALS = 8;         // teto da matriz de placares
   const BASE_GOALS = 1.35;     // média de gols por time num confronto equilibrado
+  const ELO_WEIGHT = 0.70;     // peso do Elo no blend (resto = forma das eliminatórias)
+  const GOALS_BASE = 1.30;     // gols/jogo de referência no modelo ataque×defesa
 
   // -------- Poisson --------
   function factorial(n) {
@@ -43,10 +45,12 @@
     return { la: la, lb: lb };
   }
 
-  // Elo efetivo considerando mando (apenas anfitriões ganham bônus).
+  // Força efetiva: usa o Índice de Força (team.power = Elo + ajuste de FIFA/valor/
+  // forma) quando disponível; senão, o Elo cru. Anfitriões ganham bônus de mando.
   function effectiveElo(team) {
     if (!team) return 1500;
-    return team.elo + (team.anfitria ? HOME_BONUS_ELO : 0);
+    const base = team.power != null ? team.power : team.elo;
+    return base + (team.anfitria ? HOME_BONUS_ELO : 0);
   }
 
   // -------- Matriz de placares (Poisson + Dixon-Coles) --------
@@ -103,16 +107,44 @@
     return best;
   }
 
+  // Gols esperados pelo ataque×defesa das eliminatórias (forças normalizadas).
+  // Retorna null se faltar a "forma" de algum dos lados.
+  function goalsFromForm(teamA, teamB) {
+    if (!teamA || !teamB) return null;
+    if (teamA.sAtk == null || teamA.sDef == null) return null;
+    if (teamB.sAtk == null || teamB.sDef == null) return null;
+    return {
+      la: GOALS_BASE * teamA.sAtk * teamB.sDef,
+      lb: GOALS_BASE * teamB.sAtk * teamA.sDef,
+    };
+  }
+
   // -------- Predição completa de um confronto --------
-  // teamA / teamB são objetos de WC2026_TEAMS (ou null). neutral=true zera o mando.
+  // teamA / teamB são objetos de WC2026_TEAMS (idealmente já com Elo atual e as
+  // forças sAtk/sDef das eliminatórias). neutral=true zera o mando.
   function predict(teamA, teamB, opts) {
     opts = opts || {};
     const eloA = opts.neutral ? (teamA ? teamA.elo : 1500) : effectiveElo(teamA);
     const eloB = opts.neutral ? (teamB ? teamB.elo : 1500) : effectiveElo(teamB);
-    const L = eloToLambdas(eloA, eloB);
-    const matrix = scoreMatrix(L.la, L.lb);
+
+    // 1) componente Elo (força global, cross-confederação)
+    const Lelo = eloToLambdas(eloA, eloB);
+
+    // 2) componente eliminatórias (ataque×defesa, "estilo" de cada seleção)
+    const Lform = goalsFromForm(teamA, teamB);
+
+    // 3) blend
+    let la = Lelo.la, lb = Lelo.lb;
+    if (Lform) {
+      la = ELO_WEIGHT * Lelo.la + (1 - ELO_WEIGHT) * Lform.la;
+      lb = ELO_WEIGHT * Lelo.lb + (1 - ELO_WEIGHT) * Lform.lb;
+    }
+    la = Math.min(4.5, Math.max(0.15, la));
+    lb = Math.min(4.5, Math.max(0.15, lb));
+
+    const matrix = scoreMatrix(la, lb);
     return {
-      lambdas: L,
+      lambdas: { la: la, lb: lb, elo: Lelo, form: Lform },
       matrix: matrix,
       probs: oneXtwo(matrix),
       placar: mostLikelyScore(matrix),

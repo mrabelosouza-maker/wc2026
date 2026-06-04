@@ -9,10 +9,12 @@ está pronto para o GitHub Pages.
 1. **📅 Calendário** — os 72 jogos da fase de grupos + o chaveamento do mata-mata
    descrito por posição ("Vencedor do Grupo X" vs "2º do Grupo Y"), preenchido
    automaticamente conforme os grupos terminam. **Jogos do Brasil em destaque.**
-2. **📊 Previsões** — modelo estatístico (Elo → Poisson com correção Dixon-Coles)
-   que estima, por jogo, vitória/empate/derrota e o placar mais provável; **mais**
-   uma simulação de **Monte Carlo** do torneio inteiro (chance de avançar de fase e
-   de ser campeã).
+2. **📊 Previsões** — modelo estatístico que combina **Elo** com a **forma das
+   eliminatórias** (ataque×defesa) → Poisson + Dixon-Coles, estimando por jogo
+   vitória/empate/derrota e o placar mais provável; **mais** uma simulação de
+   **Monte Carlo** do torneio e a **projeção do caminho do mata-mata até a final**
+   (com a rota do Brasil destacada). Metodologia detalhada em
+   [`docs/MODELO.md`](docs/MODELO.md).
 3. **🔄 Lógica adaptativa** — lê os resultados encerrados, recalcula o Elo de cada
    seleção a cada jogo, atualiza a classificação, preenche o chaveamento e re-roda
    as previsões.
@@ -37,12 +39,14 @@ index.html              # shell com as abas
 css/styles.css          # tema/layout
 js/data/                # dados (fonte de verdade, fácil de corrigir)
   teams.js              #   48 seleções + grupo + Elo-semente
+  form.js               #   gols nas eliminatórias → forças ataque/defesa
   groups.js             #   grupos A–L (derivados de teams.js)
   fixtures.js           #   72 jogos da fase de grupos
   bracket.js            #   template do mata-mata (R32 → Final)
-js/model.js             # Poisson + Elo + Dixon-Coles
+js/model.js             # Poisson + Dixon-Coles + blend Elo×forma
 js/standings.js         # classificação + melhores 3º + replay de Elo
-js/simulate.js          # Monte Carlo do torneio
+js/simulate.js          # Monte Carlo + projeção do caminho até a final
+docs/MODELO.md          # como as probabilidades/placares são estimados
 js/app.js               # render + abas + loop adaptativo
 data/results.js         # resultados encerrados (gerado pelo Action)
 scripts/fetch-results.mjs       # busca resultados (Node, sem API key)

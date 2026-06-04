@@ -18,6 +18,7 @@
     <nav class="tabs" role="tablist">
       <button class="tab active" data-tab="calendario" role="tab">📅 Calendário</button>
       <button class="tab" data-tab="previsoes" role="tab">📊 Previsões</button>
+      <button class="tab" data-tab="estatisticas" role="tab">📈 Estatísticas</button>
     </nav>
   </header>
 
@@ -54,10 +55,101 @@
         e os resultados já encerrados.</p>
       <div id="mc-tabela" class="mc-tabela"></div>
 
+      <h2 class="section-title">Caminho do Mata-mata até a Final (projeção)</h2>
+      <p class="hint">Projeção determinística: em cada confronto avança o favorito do modelo,
+        desenhando o caminho mais provável até o título. O caminho do Brasil é destacado,
+        com a probabilidade de vencer cada jogo e a chance acumulada de chegar a cada fase.</p>
+      <div id="projecao-resumo" class="projecao-resumo"></div>
+      <h3 class="sub-title">Chaveamento projetado (todos os confrontos)</h3>
+      <p class="hint">Cada confronto mostra os classificados projetados; o vencedor previsto
+        fica destacado, com a probabilidade de avançar. O Brasil aparece realçado.</p>
+      <div id="projecao-bracket" class="bracket"></div>
+      <div id="brasil-caminho" class="brasil-caminho"></div>
+
       <h2 class="section-title">Previsão por Jogo</h2>
       <p class="hint">Probabilidade de vitória / empate / derrota e placar mais provável.
         Após o jogo, mostra o resultado real e se o modelo acertou o 1X2.</p>
       <div id="previsoes-lista" class="previsoes-lista"></div>
+    </section>
+
+    <!-- ABA 3: ESTATÍSTICAS -->
+    <section id="tab-estatisticas" class="tabpanel">
+      <p class="hint">Os números que alimentam as estimativas: <b>Elo</b> (força global) e o
+        desempenho nas <b>eliminatórias</b> (gols marcados/sofridos por jogo e as forças de
+        ataque/defesa normalizadas). Use os filtros e clique nos cabeçalhos da tabela para ordenar.</p>
+
+      <details class="stats-explainer" open>
+        <summary>ⓘ O que cada métrica mede</summary>
+        <dl class="glossario">
+          <div><dt>Índice de Força</dt><dd>Nosso número-resumo de força usado no modelo:
+            o <b>Elo atual + um ajuste</b> que combina Ranking FIFA, valor de mercado e forma
+            recente. É o que "manda" na probabilidade de cada jogo. Maior = mais forte.</dd></div>
+          <div><dt>Elo</dt><dd>Nota de força relativa baseada em <b>resultados</b>. Vem do
+            eloratings.net e é <b>recalculado a cada jogo</b> da Copa. Referência: ~100 pontos de
+            diferença já indica favoritismo; ~400 pontos ≈ o favorito vence ~90% das vezes.</dd></div>
+          <div><dt>Ranking FIFA (pts)</dt><dd>Pontos do ranking oficial FIFA/Coca-Cola. Segunda
+            opinião de força (entra com peso menor por ser parecido com o Elo).</dd></div>
+          <div><dt>Valor de mercado (€M)</dt><dd>Valor total do elenco (Transfermarkt), em milhões
+            de €. Proxy de <b>talento individual</b> — capta qualidade que os resultados recentes
+            podem não mostrar.</dd></div>
+          <div><dt>Forma (pts/jogo)</dt><dd>Aproveitamento nos <b>últimos ~10 jogos</b> (vitória=3,
+            empate=1). Capta o <b>momento</b> atual, que o Elo demora a refletir.</dd></div>
+          <div><dt>GM/j — Gols marcados por jogo</dt><dd>Média de gols que a seleção <b>fez</b>
+            por partida na sua campanha de <b>eliminatórias</b>. Mede a potência ofensiva bruta.</dd></div>
+          <div><dt>GS/j — Gols sofridos por jogo</dt><dd>Média de gols que a seleção <b>sofreu</b>
+            por partida nas eliminatórias. <b>Quanto menor, melhor</b> a defesa.</dd></div>
+          <div><dt>sAtk — Força de ataque</dt><dd>GM/j da seleção <b>dividido pela média da sua
+            confederação</b> (e suavizado). <b>&gt;1</b> = ataca acima dos seus pares; <b>&lt;1</b> = abaixo.
+            Normalizado para permitir comparar times de confederações diferentes.</dd></div>
+          <div><dt>sDef — Força de defesa</dt><dd>GS/j <b>dividido pela média da confederação</b>
+            (e suavizado). <b>&lt;1</b> = defende melhor que os pares (sofre menos); <b>&gt;1</b> = pior.</dd></div>
+        </dl>
+        <p class="glossario-nota"><b>Como o Índice de Força é montado:</b> partimos do Elo (peso
+          dominante) e somamos um ajuste limitado (±70) vindo de valor de mercado (45%), forma
+          recente (30%) e Ranking FIFA (25%), cada um padronizado entre as 48 seleções. O Elo
+          continua mudando a cada jogo; os outros três são fixos.</p>
+        <p class="glossario-nota">Por que normalizar e suavizar? As eliminatórias têm níveis muito
+          diferentes — sofrer 0,2 gol/jogo na CAF (adversários mais fracos) não é o mesmo que na
+          CONMEBOL. Por isso dividimos pela média da confederação e "puxamos" os extremos de volta
+          para a média (encolhimento), deixando o Elo carregar a força absoluta. No
+          <b>gráfico de dispersão</b>: o ideal é o canto <b>inferior direito</b> (ataca muito ↘ e
+          sofre pouco). Detalhes completos em <code>docs/MODELO.md</code>.</p>
+      </details>
+
+      <div class="stats-controls">
+        <label>Confederação
+          <select id="filtro-conf"><option value="">Todas</option></select>
+        </label>
+        <label>Grupo
+          <select id="filtro-grupo"><option value="">Todos</option></select>
+        </label>
+        <label>Métrica do ranking
+          <select id="metric-bar">
+            <option value="power">Índice de Força</option>
+            <option value="elo">Elo</option>
+            <option value="fifa">Ranking FIFA (pts)</option>
+            <option value="mv">Valor de mercado (€M)</option>
+            <option value="form">Forma (pts/jogo)</option>
+            <option value="gm">Gols marcados/jogo</option>
+            <option value="gs">Gols sofridos/jogo</option>
+            <option value="sAtk">Força de ataque (sAtk)</option>
+            <option value="sDef">Força de defesa (sDef)</option>
+          </select>
+        </label>
+      </div>
+
+      <h2 class="section-title">Ranking por métrica</h2>
+      <div id="grafico-barras" class="grafico-barras"></div>
+
+      <h2 class="section-title">Ataque × Defesa nas eliminatórias</h2>
+      <p class="hint">Cada ponto é uma seleção. Eixo X = gols marcados/jogo (quanto mais à direita,
+        mais ofensiva); Eixo Y = gols sofridos/jogo (quanto mais embaixo, melhor defesa).
+        Cor por confederação; Brasil destacado.</p>
+      <div id="grafico-scatter" class="grafico-scatter"></div>
+      <div id="scatter-legenda" class="scatter-legenda"></div>
+
+      <h2 class="section-title">Tabela completa</h2>
+      <div id="tabela-stats" class="tabela-stats"></div>
     </section>
   </main>
 
@@ -69,12 +161,15 @@
 
   <!-- Dados (variáveis globais — funcionam via file://) -->
   <script src="js/data/teams.js"></script>
+  <script src="js/data/form.js"></script>
+  <script src="js/data/extras.js"></script>
   <script src="js/data/groups.js"></script>
   <script src="js/data/fixtures.js"></script>
   <script src="js/data/bracket.js"></script>
   <script src="data/results.js"></script>
 
   <!-- Motor + lógica -->
+  <script src="js/ratings.js"></script>
   <script src="js/model.js"></script>
   <script src="js/standings.js"></script>
   <script src="js/simulate.js"></script>

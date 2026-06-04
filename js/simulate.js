@@ -157,5 +157,113 @@
     });
   }
 
-  window.WC2026_SIM = { run: run };
+  // ===================================================================
+  // PROJEÇÃO DETERMINÍSTICA do chaveamento (caminho "mais provável").
+  // Diferente do Monte Carlo (que é probabilístico), aqui escolhemos o
+  // favorito em cada confronto para desenhar UM caminho até a final, com a
+  // probabilidade de cada passo. Se forceCode for dado, força aquela seleção a
+  // avançar (para mostrar o "caminho se o Brasil passar"), exibindo mesmo assim
+  // a probabilidade real de cada jogo.
+  // ===================================================================
+  function expectedGroupOrder(state, teamByCode) {
+    const groupRank = {};
+    const thirdsPool = [];
+    GROUPS.letters.forEach(function (L) {
+      const pts = {};
+      state.groups[L].table.forEach(function (r) {
+        pts[r.team.codigo] = { team: r.team, pts: r.pts };
+      });
+      // soma pontos esperados dos jogos restantes do grupo
+      FIXTURES.filter(function (f) { return f.grupo === L; }).forEach(function (f) {
+        if (state.idx.byPair[STAND.pairKey(f.mandante, f.visitante)]) return; // já jogado
+        const A = teamByCode[f.mandante], B = teamByCode[f.visitante];
+        const p = MODEL.predict(A, B).probs;
+        pts[f.mandante].pts += 3 * p.win + 1 * p.draw;
+        pts[f.visitante].pts += 3 * p.loss + 1 * p.draw;
+      });
+      const arr = GROUPS.byLetter[L].map(function (t) { return pts[t.codigo]; });
+      arr.sort(function (x, y) {
+        if (y.pts !== x.pts) return y.pts - x.pts;
+        return teamByCode[y.team.codigo].elo - teamByCode[x.team.codigo].elo;
+      });
+      groupRank[L] = arr.map(function (r) { return r.team; });
+      thirdsPool.push({ team: arr[2].team, pts: arr[2].pts });
+    });
+    thirdsPool.sort(function (a, b) {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      return teamByCode[b.team.codigo].elo - teamByCode[a.team.codigo].elo;
+    });
+    const thirds = thirdsPool.slice(0, 8).map(function (t) { return t.team; });
+    return { groupRank: groupRank, thirds: thirds };
+  }
+
+  function projectBracket(state, forceCode) {
+    const teamByCode = {};
+    TEAMS.list.forEach(function (t) { teamByCode[t.codigo] = STAND.teamWithElo(t, state.elos); });
+
+    const order = expectedGroupOrder(state, teamByCode);
+    const fill = {};
+
+    function slotTeam(slot) {
+      if (slot.win) return order.groupRank[slot.win][0];
+      if (slot.run) return order.groupRank[slot.run][1];
+      if (slot.third) return order.thirds[slot.third - 1] || null;
+      if (slot.from) { const p = fill[slot.from]; return p ? p.winner : null; }
+      return null;
+    }
+
+    BRACKET.rounds.forEach(function (round) {
+      round.jogos.forEach(function (j) {
+        const a = slotTeam(j.a), b = slotTeam(j.b);
+        let winner = null, pa = 1;
+        const real = state.bracketTeams[j.id] && state.bracketTeams[j.id].winner;
+        if (real) {
+          winner = real; pa = 1;
+        } else if (a && b) {
+          const pAadv = MODEL.knockoutWinProb(MODEL.predict(teamByCode[a.codigo], teamByCode[b.codigo]).probs);
+          const forced = forceCode && (a.codigo === forceCode || b.codigo === forceCode);
+          if (forced) {
+            const forcedIsA = a.codigo === forceCode;
+            winner = forcedIsA ? a : b;
+            pa = forcedIsA ? pAadv : (1 - pAadv);
+          } else {
+            winner = pAadv >= 0.5 ? a : b;
+            pa = pAadv >= 0.5 ? pAadv : (1 - pAadv);
+          }
+        } else {
+          winner = a || b; pa = 1;
+        }
+        fill[j.id] = { a: a, b: b, winner: winner, pa: pa };
+      });
+    });
+
+    // caminho de forceCode (se houver): rodada a rodada
+    let path = null;
+    if (forceCode) {
+      path = [];
+      let cum = 1;
+      BRACKET.rounds.forEach(function (round) {
+        round.jogos.forEach(function (j) {
+          const m = fill[j.id];
+          if (!m.a || !m.b) return;
+          const isA = m.a.codigo === forceCode, isB = m.b.codigo === forceCode;
+          if (!isA && !isB) return;
+          const opp = isA ? m.b : m.a;
+          cum *= m.pa;
+          path.push({ fase: round.fase, jogoId: j.id, opp: opp, pWin: m.pa, cum: cum });
+        });
+      });
+    }
+
+    return {
+      fill: fill,
+      groupRank: order.groupRank,
+      thirds: order.thirds,
+      finalGame: fill["FINAL"],
+      champion: fill["FINAL"] ? fill["FINAL"].winner : null,
+      path: path,
+    };
+  }
+
+  window.WC2026_SIM = { run: run, projectBracket: projectBracket };
 })();

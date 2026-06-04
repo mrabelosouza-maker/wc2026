@@ -148,6 +148,32 @@ main { padding: 26px; max-width: 1180px; margin: 0 auto; }
 .prev-real { margin-top: 8px; font-size: 12.5px; padding-top: 8px; border-top: 1px solid var(--line2); }
 .acerto { color: var(--win); font-weight: 700; } .erro { color: var(--loss); font-weight: 700; }
 
+/* ===== Projeção / caminho até a final ===== */
+.projecao-resumo { margin-bottom: 16px; }
+.proj-cards { display: flex; flex-wrap: wrap; gap: 14px; }
+.proj-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 12px 18px; box-shadow: var(--shadow); min-width: 230px;
+}
+.proj-card.champ { border-color: var(--accent2); background: #fffaf0; }
+.proj-card .proj-k { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.proj-card .proj-v { font-size: 16px; font-weight: 700; }
+.proj-card .x { color: var(--muted); font-weight: 400; }
+
+.brasil-caminho { margin-top: 4px; }
+.caminho-titulo { font-weight: 700; margin: 6px 0 12px; color: var(--brasil-green); }
+.caminho-trilha { display: flex; flex-wrap: wrap; gap: 10px; }
+.caminho-passo {
+  background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--brasil-green);
+  border-radius: 10px; padding: 10px 14px; min-width: 165px; box-shadow: var(--shadow);
+}
+.caminho-passo.risco { border-left-color: var(--loss); }
+.caminho-passo .cp-fase { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+.caminho-passo .cp-opp { font-weight: 700; font-size: 14px; margin: 3px 0; }
+.caminho-passo .cp-prob { font-size: 13px; }
+.caminho-passo .cp-prob b { color: var(--accent); }
+.caminho-passo .cp-cum { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
 /* ===== Monte Carlo tabela ===== */
 .mc-tabela { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line); }
 table.mc { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); }
@@ -161,6 +187,66 @@ table.mc tr.brasil td.tname { color: var(--brasil-green); font-weight: 700; }
 .barcell { position: relative; }
 .barcell .barfill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(10,143,106,.16); }
 .barcell span { position: relative; font-weight: 600; }
+
+.sub-title { font-size: 14px; font-weight: 700; color: #111827; margin: 22px 0 4px; }
+.bracket-side .bm-prob { font-size: 11px; color: var(--accent); font-weight: 700; margin-left: 6px; }
+
+/* ===== Aba Estatísticas ===== */
+.stats-explainer {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 12px 16px; margin: 4px 0 16px;
+}
+.stats-explainer > summary {
+  cursor: pointer; font-weight: 700; color: var(--accent); font-size: 14px; list-style: none;
+}
+.stats-explainer > summary::-webkit-details-marker { display: none; }
+.stats-explainer > summary::before { content: "▸ "; }
+.stats-explainer[open] > summary::before { content: "▾ "; }
+.glossario { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px 22px; margin: 14px 0 6px; }
+.glossario dt { font-weight: 700; color: #111827; font-size: 13px; margin-bottom: 2px; }
+.glossario dd { margin: 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+.glossario-nota { color: var(--muted); font-size: 12.5px; line-height: 1.55; margin: 6px 0 0; border-top: 1px solid var(--line2); padding-top: 10px; }
+.glossario-nota code { background: var(--bg2); padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+
+.stats-controls { display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 0 4px; }
+.stats-controls label { font-size: 12px; color: var(--muted); display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.stats-controls select {
+  background: var(--card); color: var(--txt); border: 1px solid var(--line);
+  border-radius: 8px; padding: 7px 10px; font-size: 13px; min-width: 180px; cursor: pointer;
+}
+.stats-controls select:focus { outline: none; border-color: var(--accent); }
+
+/* ranking de barras */
+.grafico-barras { display: flex; flex-direction: column; gap: 4px; max-height: 520px; overflow-y: auto; padding-right: 6px; }
+.bar-row { display: grid; grid-template-columns: 180px 1fr 52px; align-items: center; gap: 10px; font-size: 12.5px; }
+.bar-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--txt); }
+.bar-track { background: var(--bg2); border-radius: 6px; height: 16px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width .3s ease; }
+.bar-val { text-align: right; font-weight: 700; color: var(--txt); }
+.bar-row.brasil .bar-label { color: var(--brasil-green); font-weight: 700; }
+
+/* scatter */
+.grafico-scatter { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px; max-width: 720px; }
+.scatter-svg { width: 100%; height: auto; }
+.scatter-svg .grid { stroke: var(--line2); stroke-width: 1; }
+.scatter-svg .axis-txt { fill: var(--muted); font-size: 11px; }
+.scatter-svg .axis-lbl { fill: var(--muted); font-size: 12px; font-weight: 600; }
+.scatter-svg .pt-lbl { fill: var(--brasil-green); font-size: 12px; font-weight: 700; }
+.scatter-svg circle { cursor: pointer; }
+.scatter-legenda { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; font-size: 12px; color: var(--muted); }
+.leg-item { display: flex; align-items: center; gap: 6px; }
+.leg-dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+
+/* tabela ordenável */
+.tabela-stats { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--line); }
+table.stats-table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--card); }
+table.stats-table th, table.stats-table td { padding: 8px 12px; text-align: right; border-bottom: 1px solid var(--line2); white-space: nowrap; }
+table.stats-table th { color: var(--muted); font-weight: 600; background: var(--card2); cursor: pointer; user-select: none; position: sticky; top: 0; }
+table.stats-table th:hover { color: var(--accent); }
+table.stats-table th.tleft, table.stats-table td.tleft { text-align: left; }
+table.stats-table tr:hover td { background: var(--bg2); }
+table.stats-table tr.brasil td { background: var(--brasil-bg); }
+table.stats-table tr.brasil td.tleft { color: var(--brasil-green); font-weight: 700; }
 
 /* ===== Footer ===== */
 .footer {

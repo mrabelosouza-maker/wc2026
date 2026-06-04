@@ -3,9 +3,10 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# Editores
+# Editores / ferramentas
 .vscode/
 .idea/
+.claude/
 
 # Logs
 *.log

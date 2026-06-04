@@ -192,12 +192,26 @@
     };
   }
 
-  // Devolve um clone de seleção com o Elo atual (p/ alimentar o modelo).
+  // Devolve um clone de seleção com o Elo atual E as forças de ataque/defesa das
+  // eliminatórias (sAtk/sDef), prontas para alimentar o modelo blended.
   function teamWithElo(team, elos) {
     if (!team) return null;
     const e = elos[team.codigo];
-    if (e == null) return team;
-    return Object.assign({}, team, { elo: e });
+    const extra = { elo: e == null ? team.elo : e };
+    const FORM = window.WC2026_FORM;
+    if (FORM && FORM.byCode[team.codigo]) {
+      const f = FORM.byCode[team.codigo];
+      extra.sAtk = f.sAtk; extra.sDef = f.sDef; extra.conf = f.conf;
+    }
+    // Índice de Força: Elo atual + ajuste estático (FIFA, valor de mercado, forma).
+    const R = window.WC2026_RATINGS;
+    if (R && R.byCode[team.codigo]) {
+      const r = R.byCode[team.codigo];
+      extra.offset = r.offset;
+      extra.power = extra.elo + r.offset;
+      extra.fifaPts = r.fifaPts; extra.mv = r.mv; extra.formPpg = r.formPpg;
+    }
+    return Object.assign({}, team, extra);
   }
 
   window.WC2026_STANDINGS = {
