@@ -1,6 +1,6 @@
 /* Gerado automaticamente por scripts/fetch-results.mjs. NÃO editar à mão. */
 window.WC2026_RESULTS = {
-  last_update: "2026-06-09T21:21:13.963Z",
+  last_update: "2026-06-09T23:01:33.743Z",
   source: "TheSportsDB",
   matches: [
   ],
