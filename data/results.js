@@ -1,6 +1,6 @@
 /* Gerado automaticamente por scripts/fetch-results.mjs. NÃO editar à mão. */
 window.WC2026_RESULTS = {
-  last_update: "2026-08-21T09:48:10.363Z",
+  last_update: "2026-08-21T10:37:00.339Z",
   source: "TheSportsDB",
   matches: [
     {"mandante":"MEX","visitante":"RSA","golsMandante":2,"golsVisitante":0,"status":"encerrado","dataISO":"2026-06-11","fase":"grupos","bracketId":null,"vencedor":null},
